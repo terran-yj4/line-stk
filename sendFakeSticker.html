@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="jp" dir="ltr">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Send BigSticker</title>
+  <script src="https://static.line-scdn.net/liff/edge/2.1/sdk.js"></script>
+  <script type="text/javascript">
+    // URLを取得
+    let url = new URL(window.location.href);
+    // URLSearchParamsオブジェクトを取得
+    let params = url.searchParams;
+    // それぞれのパラメータを変数に代入
+    let type = params.get('type')
+    document.addEventListener("DOMContentLoaded", () => {
+      liff
+        .init({
+          liffId: '1656316634-09bXLKaV'
+        })
+        .then(() => {
+          alert(JSON.stringify(liff.getProfile()));
+          if (type == "stk") {
+            let stk = params.get('stk')
+            let sid = params.get('sid')
+            let pkgid = params.get('pkg')
+            let imgurl = "https://stickershop.line-scdn.net/stickershop/v1/sticker/" + sid + "/iPhone/sticker@2x.png"
+            let link = "https://line.me/S/sticker/" + pkgid
+            if (stk == "anim") {
+              imgurl = "https://stickershop.line-scdn.net/stickershop/v1/sticker/" + sid + "/iPhone/sticker_animation@2x.png"
+            }
+            liff.sendMessages([
+              {
+                "type": "template",
+                "altText": "BigStickerが送信されました",
+                "template": {
+                  "type": "image_carousel",
+                  "columns": [
+                    {
+                      "imageUrl": imgurl,
+                      "action": {
+                        "type": "uri",
+                        "uri": link
+                      }
+                    }
+                  ]
+                }
+              }
+            ])
+              .then(function () {
+                document.getElementById('log').value += 'sendMessagesFlex completed\n';
+                liff.closeWindow()
+              }).catch(function (error) {
+                document.getElementById('log').value += 'sendMessagesText()=' + error + '\n';
+                alert("トークルームが開かれていません。\n送信先ルームを開いて実行してね。\n\n"+error)
+                liff.closeWindow()
+              });
+          }
+        })
+        .catch((err) => {
+          document.getElementById('log').value = 'init ng\n' + err;
+          alert("initialization failed")
+          liff.closeWindow()
+        });
+    });
+  </script>
+</head>
+
+<body>
+  <div>
+    <h3>sendMessage</h3>
+    <textarea id="log" placeholder="Log" style="width:96%;height:100px;"></textarea>
+  </div>
+</body>
+
+</html>
